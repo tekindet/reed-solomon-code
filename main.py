@@ -9,6 +9,14 @@ error-correcting codes over Galois Field GF(2^8) using polynomial arithmetic
 
 def build_generator_poly(nsym):
     G_x = GF256Poly([1])
+
+    for i in range(nsym):
+
+        alpha_i = GF256.pow(2,i) 
+        factor = GF256Poly([1,alpha_i])
+
+        G_x *= factor
+
     return G_x
 
 class GF256:
@@ -67,23 +75,25 @@ class GF256Poly:
         pass
 
     def __mul__(self,other):
-        pass
+        # if you multiply two polynomials a and b of 
+        # degree N-1 then the result will be of degree
+        # 2N - 2 = 2(N-1)
+        res = [0] * (len(self.coeffs) + len(other.coeffs))
+        for i,a in enumerate(self.coeffs):
+            for j,b in enumerate(other.coeffs):
+                res[i + j] = GF256.add(res[i + j],GF256.mul(a,b)) 
+
+        return GF256Poly(res)
 
     def divmod(self,divisor):
         pass
 
     def __repr__(self):
-        # todo : implement this next so we can start 
-        # testing it immediately
-
         terms = []
-        # idx = 0 char = 1
 
         for idx,char in enumerate(self.coeffs):
-            # degree here is zero
             deg = len(self.coeffs) - 1
 
-            # power here is then zero
             power = deg - idx
 
             coeff_str = f"{char}" if(char != 1 or power == 0) else ""
@@ -103,5 +113,12 @@ if __name__ == "__main__":
     msg_bytes = [ord(c) for c in msg]
 
     M_x = GF256Poly(msg_bytes)
+    G_x = build_generator_poly(4)
+
+    print("M_x : ")
+    print("===" * 8)
     print(M_x)
+    print("===" * 8)
+    print("G_x : ")
+    print(G_x)
 
