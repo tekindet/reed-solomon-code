@@ -1,5 +1,15 @@
+"""
+Reed-Solomon (RS) Code Implementation & Finite Field Arithmetic
+
+Author: Nathan Kimutai(tekindet)
+
+This module provides a standalone, zero-dependency implementation of Reed-Solomon
+error-correcting codes over Galois Field GF(2^8) using polynomial arithmetic
+"""
+
 def build_generator_poly(nsym):
-    pass
+    G_x = GF256Poly([1])
+    return G_x
 
 class GF256:
     PRIM = 0x11D
