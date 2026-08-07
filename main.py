@@ -67,21 +67,23 @@ class GF256Poly:
         # testing it immediately
 
         terms = []
+        # idx = 0 char = 1
+
         for idx,char in enumerate(self.coeffs):
+            # degree here is zero
             deg = len(self.coeffs) - 1
 
+            # power here is then zero
             power = deg - idx
 
             coeff_str = f"{char}" if(char != 1 or power == 0) else ""
 
             if power == 0:
                 terms.append(f"{char}")
-            if power == 1:
+            elif power == 1:
                 terms.append(f"{coeff_str}x")
             else:
                 terms.append(f"{coeff_str}x^{power}")
-
-            terms.append(coeff_str)
 
         return " + ".join(terms) if terms else "0"
 
