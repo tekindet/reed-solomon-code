@@ -12,7 +12,8 @@ def build_generator_poly(nsym):
 
     for i in range(nsym):
 
-        alpha_i = GF256.pow(2,i) 
+        alpha_i = GF256.pow(2,i)
+
         factor = GF256Poly([1,alpha_i])
 
         G_x *= factor
@@ -78,7 +79,7 @@ class GF256Poly:
         # if you multiply two polynomials a and b of 
         # degree N-1 then the result will be of degree
         # 2N - 2 = 2(N-1)
-        res = [0] * (len(self.coeffs) + len(other.coeffs))
+        res = [0] * (len(self.coeffs) + len(other.coeffs) - 1)
         for i,a in enumerate(self.coeffs):
             for j,b in enumerate(other.coeffs):
                 res[i + j] = GF256.add(res[i + j],GF256.mul(a,b)) 
