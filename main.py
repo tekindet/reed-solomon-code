@@ -144,10 +144,15 @@ if __name__ == "__main__":
     M_x = GF256Poly(msg_bytes)
     G_x = build_generator_poly(nsym)
 
-    res = M_x.divmod(G_x)
-
+    # x^4 for parity symbols
     shift_factor = GF256Poly([1] + [0] * nsym)
 
-    print("---------------")
-    print(shift_factor)
+    M_shifted = M_x * shift_factor
+
+    Q_x,P_x = M_shifted.divmod(G_x)
+
+    C_x = M_shifted + P_x
+
+    print(f"Final Codeword C(x):\n{C_x}")
+
 
