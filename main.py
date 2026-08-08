@@ -110,9 +110,15 @@ class GF256Poly:
         
 
     def __repr__(self):
+
+        if self.coeffs == [0]:
+            return "0"
+
         terms = []
 
         for idx,char in enumerate(self.coeffs):
+            if char == 0:
+                continue
             deg = len(self.coeffs) - 1
 
             power = deg - idx
@@ -143,7 +149,5 @@ if __name__ == "__main__":
     shift_factor = GF256Poly([1] + [0] * nsym)
 
     print("---------------")
-    print(res[0])
-    print("---------------")
-    print(res[1])
+    print(shift_factor)
 
