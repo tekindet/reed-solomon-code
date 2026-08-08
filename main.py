@@ -87,7 +87,27 @@ class GF256Poly:
         return GF256Poly(res)
 
     def divmod(self,divisor):
-        pass
+        # return a quotient and a reminder
+        out = list(self.coeffs)
+        # leading term of divisor
+        norm = divisor.coeffs[0]
+
+        for i in range(len(self.coeffs) - len(divisor.coeffs) + 1):
+            out[i] = GF256.div(out[i],norm)
+            coeff = out[i]
+
+            if coeff != 0:
+                for j in range(1,len(divisor.coeffs)):
+
+                    out[i + j] = GF256.add(
+                            out[i + j],
+                            GF256.mul(divisor.coeffs[j],coeff))
+
+        separator = len(self.coeffs) - len(divisor.coeffs) + 1
+
+        return GF256Poly(out[:separator]),GF256Poly(out[separator:])
+
+        
 
     def __repr__(self):
         terms = []
@@ -111,15 +131,19 @@ class GF256Poly:
 if __name__ == "__main__":
     msg = "this is a test message"
 
+    nsym = 4
+
     msg_bytes = [ord(c) for c in msg]
 
     M_x = GF256Poly(msg_bytes)
-    G_x = build_generator_poly(4)
+    G_x = build_generator_poly(nsym)
 
-    print("M_x : ")
-    print("===" * 8)
-    print(M_x)
-    print("===" * 8)
-    print("G_x : ")
-    print(G_x)
+    res = M_x.divmod(G_x)
+
+    shift_factor = GF256Poly([1] + [0] * nsym)
+
+    print("---------------")
+    print(res[0])
+    print("---------------")
+    print(res[1])
 
