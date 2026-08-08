@@ -1,1 +1,81 @@
-# reed-solomon-code
+# Reed-Solomon Error-Correcting Codes
+
+A standalone, zero-dependency implementation of [Reed-Solomon error-correcting
+codes](https://en.wikipedia.org/wiki/Reed%E2%80%93Solomon_error_correction) over
+the Galois field GF(2^8), built from first principles for learning purposes.
+
+Author: [Nathan Kimutai (tekindet)](https://github.com/tekindet)
+
+## Overview
+
+Reed-Solomon codes add redundant (parity) symbols to a message so that errors
+introduced during transmission or storage can be detected and corrected. This
+project implements the underlying machinery from scratch:
+
+- **Finite field arithmetic** — multiplication, division, addition, and
+  exponentiation over GF(2^8) using log/antilog tables.
+- **Polynomial arithmetic** — addition, multiplication, and polynomial
+  division over GF(2^8) via a `GF256Poly` class.
+- **Generator polynomial** — builds `G(x) = (x - α^0)(x - α^1) ... (x - α^(n-1))`
+  for a chosen number of parity symbols `nsym`.
+- **Encoding** — computes parity symbols as the remainder of the message
+  polynomial divided by the generator, producing the final codeword.
+
+## Project status
+
+⚠️ **Work in progress.** Encoding is working, but decoding/error correction is
+not implemented yet. See [Roadmap](#roadmap) below.
+
+## Usage
+
+```python
+from main import build_generator_poly, GF256Poly
+
+msg = "this is a test message"
+nsym = 4  # number of parity (redundancy) symbols
+
+msg_bytes = [ord(c) for c in msg]
+
+M_x = GF256Poly(msg_bytes)          # message polynomial
+G_x = build_generator_poly(nsym)    # generator polynomial
+
+# Shift the message by nsym degrees, then divide by G(x);
+# the remainder P(x) is the parity. Codeword = message + parity.
+shift_factor = GF256Poly([1] + [0] * nsym)
+M_shifted = M_x * shift_factor
+Q_x, P_x = M_shifted.divmod(G_x)
+C_x = M_shifted + P_x
+
+print(f"Final Codeword C(x):\n{C_x}")
+```
+
+Running the module directly executes the example above:
+
+```bash
+python main.py
+```
+
+## How it works
+
+1. Represent the message bytes as the coefficients of a polynomial `M(x)` over
+   GF(2^8).
+2. Build the generator polynomial `G(x)` from consecutive powers of `α` (the
+   primitive element of the field).
+3. Shift `M(x)` by `nsym` degrees and divide by `G(x)`.
+4. Append the remainder `P(x)` — the parity symbols — to the message. The
+   resulting codeword `C(x)` is divisible by `G(x)`, which is what later allows
+   errors to be detected and corrected.
+
+## Roadmap
+
+- [x] GF(2^8) arithmetic (add, multiply, divide, pow)
+- [x] Polynomial arithmetic over GF(2^8)
+- [x] Generator polynomial construction
+- [x] Encoding (codeword generation)
+- [ ] Syndrome calculation
+- [ ] Decoding / error location (Berlekamp–Massey, Chien search)
+- [ ] Error correction and full end-to-end round-trip
+
+## License
+
+Not yet licensed.
