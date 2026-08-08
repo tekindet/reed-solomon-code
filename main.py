@@ -73,7 +73,18 @@ class GF256Poly:
         self.coeffs = coeffs[i:]
 
     def __add__(self,other):
-        pass
+        len_diff = abs(len(self.coeffs) - len(other.coeffs))
+
+        if len(self.coeffs) < len(other.coeffs):
+            c1 = [0] * len_diff + self.coeffs
+            c2 = other.coeffs
+        else:
+            c1 = self.coeffs
+            c2 = [0] * len_diff + other.coeffs
+
+        res = [GF256.add(a,b) for a,b in zip(c1,c2)]
+
+        return GF256Poly(res)
 
     def __mul__(self,other):
         # if you multiply two polynomials a and b of 
@@ -154,5 +165,8 @@ if __name__ == "__main__":
     C_x = M_shifted + P_x
 
     print(f"Final Codeword C(x):\n{C_x}")
+
+    Q_verify,R_verify = C_x.divmod(G_x)
+    print(f"Verification R_verify:\n{R_verify}")
 
 
