@@ -6,6 +6,74 @@ Author: Nathan Kimutai(tekindet)
 This module provides a standalone, zero-dependency implementation of Reed-Solomon
 error-correcting codes over Galois Field GF(2^8) using polynomial arithmetic
 """
+class RSCodec:
+
+    def __init__(self,n,k):
+        self.nsym = 4
+        self.n = n
+
+    def encode(self,msg):
+
+        msg_bytes = [ord(c) for c in msg]
+
+        M_x = GF256Poly(msg_bytes)
+        G_x = build_generator_poly(self.nsym)
+
+        # x^4 for parity symbols
+        shift_factor = GF256Poly([1] + [0] * self.nsym)
+
+        M_shifted = M_x * shift_factor
+
+        Q_x,P_x = M_shifted.divmod(G_x)
+
+        # this is the codeword, this is what we are sending
+        # to the receiver
+        C_x = M_shifted + P_x
+
+        # todo(test): introduce noise in a channel, also 
+        # refactor it so that it is easy to use
+
+        #print(f"Final Codeword C(x):\n{C_x}")
+
+        #Q_verify,R_verify = C_x.divmod(G_x)
+
+        return C_x
+
+    def decode(self,msg):
+
+        R_x = GF256Poly(msg)
+
+        rems = []
+
+        for i in range(self.nsym):
+
+            alpha_i = GF256.pow(2,i)
+
+            factor = GF256Poly([1,alpha_i])
+
+            Q_x,P_x = R_x.divmod(factor)
+
+            rems.append(P_x)
+
+
+        return rems
+
+    def berlekamp_massey(synds):
+
+        # Step 1 : Find the error locator polynomial
+        E_x = GF256Poly([])
+
+        v = self.nsym / 2
+        for j in range(v):
+            
+
+
+        # Step 2 : Find the error locations(Chien search)
+
+        # Step 3 : Calculate the error magnitudes(Forney Algo)
+
+        return E_x
+
 
 def build_generator_poly(nsym):
     G_x = GF256Poly([1])
@@ -148,25 +216,21 @@ class GF256Poly:
 if __name__ == "__main__":
     msg = "this is a test message"
 
-    nsym = 4
+    kodek = RSCodec(8,4)
 
-    msg_bytes = [ord(c) for c in msg]
+    C_x = kodek.encode(msg)
 
-    M_x = GF256Poly(msg_bytes)
-    G_x = build_generator_poly(nsym)
+    # todo : need to corrupt the message to see if it works
 
-    # x^4 for parity symbols
-    shift_factor = GF256Poly([1] + [0] * nsym)
+    encoded_msg = bytes(C_x.coeffs)
 
-    M_shifted = M_x * shift_factor
+    corrupted_msg = bytearray(encoded_msg)
+    #corrupted_msg[0] ^= 0xFF
 
-    Q_x,P_x = M_shifted.divmod(G_x)
+    rems = kodek.decode(corrupted_msg)
+    print(rems)
 
-    C_x = M_shifted + P_x
 
-    print(f"Final Codeword C(x):\n{C_x}")
 
-    Q_verify,R_verify = C_x.divmod(G_x)
-    print(f"Verification R_verify:\n{R_verify}")
 
 
