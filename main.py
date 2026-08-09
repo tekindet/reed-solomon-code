@@ -58,15 +58,33 @@ class RSCodec:
 
         return rems
 
-    def berlekamp_massey(synds):
+    def correct_error_locations(self):
+        """
+        Can only correct upto t errors where t = (n - k) / 2
+        """
+        pass
+
+
+    def find_error_locations(self,synds):
+        """
+        Can only correct upto t errors where t = (n - k) / 2
+        """
 
         # Step 1 : Find the error locator polynomial
-        E_x = GF256Poly([])
+        E_x = GF256Poly([1])
 
-        v = self.nsym / 2
-        for j in range(v):
-            
+        v = len(synds)
 
+        for i in range(v):
+            d = synds[i]
+
+            print(d)
+
+            #alpha_j = GF256.pow(2,j)
+
+            #factor = GF256Poly([1,alpha_j])
+
+            #E_x *= factor
 
         # Step 2 : Find the error locations(Chien search)
 
@@ -228,7 +246,11 @@ if __name__ == "__main__":
     #corrupted_msg[0] ^= 0xFF
 
     rems = kodek.decode(corrupted_msg)
-    print(rems)
+    #print(rems)
+
+
+    res = kodek.find_error_locations(rems)
+    #print(res)
 
 
 
