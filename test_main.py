@@ -4,7 +4,7 @@ from main import GF256, GF256Poly, RSCodec
 class TestReedSolomonDecode(unittest.TestCase):
     def setUp(self):
         self.codec = RSCodec(255,251)
-        self.msg = "this is a test message"
+        self.msg = "This is a test message"
         self.codeword = self.codec.encode(self.msg)
 
     def test_zero_syndromes_for_uncorrupted_message(self):
@@ -51,6 +51,23 @@ class TestReedSolomonDecode(unittest.TestCase):
             synds_eval,
             f"decode() syndromes {synds_decode} do not match Horner eval {synds_eval}",
          )
+
+class TestBerlekampMassey(unittest.TestCase):
+    def setUp(self):
+        self.codec = RSCodec(255, 251)
+        self.msg = "This is a test message"
+        self.codeword = self.codec.encode(self.msg)
+
+    def test_no_errors_returns_constant_one(self):
+        synds = self.codec.decode(self.codeword.coeffs)
+        error_poly = self.codec.berlekamp_massey(synds)
+
+        self.assertEqual(
+            error_poly.coeffs,
+            [1],
+            f"Expected Lambda(x) = [1], got {error_poly.coeffs}",
+         )
+        
 
 if __name__ == "__main__":
     unittest.main()
