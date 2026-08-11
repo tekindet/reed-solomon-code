@@ -286,7 +286,7 @@ class GF256Poly:
 
         res = 0
 
-        for c in range(self.coeffs):
+        for c in self.coeffs:
 
             res = GF256.add(GF256.mul(res,x_val),c)
 

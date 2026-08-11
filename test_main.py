@@ -31,8 +31,26 @@ class TestReedSolomonDecode(unittest.TestCase):
             "Syndromes should be non-zero when errors are present",
         )
 
-    def test_decode_matches_via_horners_method(self):
+    def test_decode_matches_direct_horner_eval(self):
         encoded_msg = bytes(self.codeword.coeffs)
+
+        corrupted_msg = bytearray(encoded_msg)
+        corrupted_msg[5] ^= 0x42
+        corrupted_msg[12] ^= 0xAB
+
+        synds_decode = self.codec.decode(corrupted_msg)
+
+        R_x = GF256Poly(list(corrupted_msg))
+
+        synds_eval = [
+            R_x.eval(GF256.pow(2,i)) for i in range(self.codec.nsym)
+        ]
+
+        self.assertEqual(
+            synds_decode,
+            synds_eval,
+            f"decode() syndromes {synds_decode} do not match Horner eval {synds_eval}",
+         )
 
 if __name__ == "__main__":
     unittest.main()
