@@ -68,6 +68,18 @@ class TestBerlekampMassey(unittest.TestCase):
             f"Expected Lambda(x) = [1], got {error_poly.coeffs}",
          )
         
+    def test_single_error_locator_root(self):
+        corrupted = bytearray(self.codeword.coeffs)
+        corrupted[5] ^= 0xA5
+
+        synds = self.codec.decode(corrupted)
+        error_poly = self.codec.berlekamp_massey(synds)
+
+        self.assertEqual(
+            len(error_poly.coeffs),
+            2,
+            f"Expected degree-1 polynomial, got {error_poly.coeffs}",
+        )
 
 if __name__ == "__main__":
     unittest.main()

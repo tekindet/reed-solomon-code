@@ -60,7 +60,7 @@ class RSCodec:
             d = synds[N]
 
             for i in range(1,len(C)):
-                d = GF256.add(d, GF256.mul(C[i], syndromes[N - i]))
+                d = GF256.add(d, GF256.mul(C[i], synds[N - i]))
 
                 #t_poly = GF256Poly([C[i]]) * syndromes[N - i]
 
