@@ -89,7 +89,7 @@ class RSCodec:
                     #B = quotient.coeffs
                     #B = [GF256Poly(T).divmod(d)[0].coeffs[0] for x in T]
 
-                    print(B)
+                    #print(B)
 
         return GF256Poly(C)
 
@@ -125,7 +125,7 @@ class RSCodec:
 
         R_x = GF256Poly(msg)
 
-        rems = []
+        syndromes = []
 
         for i in range(self.nsym):
 
@@ -136,10 +136,10 @@ class RSCodec:
             Q_x,P_x = R_x.divmod(factor)
 
             rem_val = P_x.coeffs[0] if P_x.coeffs else 0
-            rems.append(rem_val)
+            syndromes.append(rem_val)
 
 
-        return rems
+        return syndromes
 
     def correct_errors(self,coeffs):
         """
@@ -373,6 +373,7 @@ if __name__ == "__main__":
 
     C_x = kodek.encode(msg)
 
+    #print("C_x",C_x)
     encoded_msg = bytes(C_x.coeffs)
 
     corrupted_msg = bytearray(encoded_msg)
@@ -380,8 +381,11 @@ if __name__ == "__main__":
 
     syndromes = kodek.decode(corrupted_msg)
 
-    res = kodek.berlekamp_massey(syndromes)
-    print(res)
+    res1 = kodek.berlekamp_massey(syndromes)
+    print("res1",res1)
+
+    res2 = kodek.berlekamp_massey_second(syndromes)
+    print("res2",res2)
 
 
 
