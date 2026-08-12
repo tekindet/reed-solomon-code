@@ -7,92 +7,23 @@ This module provides a standalone, zero-dependency implementation of Reed-Solomo
 error-correcting codes over Galois Field GF(2^8) using polynomial arithmetic
 """
 class RSCodec:
-
     def __init__(self,n,k):
         self.nsym = 4
         self.n = n
 
-
-    def berlekamp_massey_second(self, syndromes):
-        # C(x) starts as 1
+    def berlekamp_massey(self,synds):
         C = GF256Poly([1])
         B = GF256Poly([1])
+
+        m = 1 
         L = 0
-        m = 1
 
-        for n in range(len(syndromes)):
-            # Compute discrepancy d
-            d = syndromes[n]
-            for i in range(1, L + 1):
-                if i <= len(C.coeffs) - 1:
-                    coef = C.coeffs[-(i + 1)]
-                    d = GF256.add(d, GF256.mul(coef, syndromes[n - i]))
+        for n in range(len(synds)):
+            d = synds[n]
 
-            if d == 0:
-                m += 1
-            else:
-                T = C
-                # C(x) = C(x) + d * B(x) * x^m
-                # Construct (d * B(x) * x^m)
-                scaled_B_coeffs = [GF256.mul(d, c) for c in B.coeffs] + [0] * m
-                scaled_B = GF256Poly(scaled_B_coeffs)
-                C = C + scaled_B  # Polynomial addition in GF(2^8) is XOR
+            for i in range(1,L + 1):
 
-                if 2 * L <= n:
-                    L = n + 1 - L
-                    # B = T / d
-                    d_inv = GF256.inv(d)
-                    B = GF256Poly([GF256.mul(c, d_inv) for c in T.coeffs])
-                    m = 1
-                else:
-                    m += 1
-
-        return C
-
-    def berlekamp_massey(self,synds):
-
-        C = [1]
-        B = [1]
-
-        v = len(synds)
-
-        for N in range(v):
-            d = synds[N]
-
-            for i in range(1,len(C)):
-                d = GF256.add(d, GF256.mul(C[i], synds[N - i]))
-
-                #t_poly = GF256Poly([C[i]]) * syndromes[N - i]
-
-                #d = d + t_poly
-
-
-            B = [0] + B
-
-            if d != 0:
-                T = list(C)
-
-                len_diff = abs(len(B) - len(C))
-
-                c1 = C + [0] * (len(B) - len(C)) if len(C) < len(B) else C
-                c2 = B + [0] * (len(C) - len(B)) if len(B) < len(C) else B
-
-                C = [GF256.add(a, GF256.mul(1, b)) for a, b in zip(c1, c2)]
-
-                if 2 * (len(T) - 1) <= N:
-
-                    #u,r = GF256Poly(T).divmod(d)
-                    #B = u.coeffs
-
-                    #quotient,remainder = d.divmod(GF256Poly(T))
-                    B = [GF256.div(x, d) for x in T]
-                    #B = quotient.coeffs
-                    #B = [GF256Poly(T).divmod(d)[0].coeffs[0] for x in T]
-
-                    #print(B)
-
-        return GF256Poly(C)
-
+                d = GF256.add(d,GF256.mul())
 
     def encode(self,msg):
 
@@ -283,7 +214,6 @@ class GF256Poly:
         self.coeffs = coeffs[i:]
 
     def eval(self,x_val):
-
         res = 0
 
         for c in self.coeffs:
@@ -384,8 +314,8 @@ if __name__ == "__main__":
     res1 = kodek.berlekamp_massey(syndromes)
     print("res1",res1)
 
-    res2 = kodek.berlekamp_massey_second(syndromes)
-    print("res2",res2)
+    #res2 = kodek.berlekamp_massey_second(syndromes)
+    #print("res2",res2)
 
 
 
